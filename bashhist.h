@@ -68,4 +68,6 @@ extern void setup_history_ignore __P((char *));
 
 extern char *last_history_line __P((void));
 
+extern void switch_history_to_stealth_mode __P((void));
+
 #endif /* _BASHHIST_H_ */

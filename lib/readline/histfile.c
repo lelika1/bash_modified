@@ -102,6 +102,8 @@ extern int errno;
 /* If non-zero, we write timestamps to the history file in history_do_write() */
 int history_write_timestamps = 0;
 
+int history_in_stealth_mode = 0;
+
 /* Does S look like the beginning of a history timestamp entry?  Placeholder
    for more extensive tests. */
 #define HIST_TIMESTAMP_START(s)		(*(s) == history_comment_char && isdigit ((s)[1]) )
@@ -570,6 +572,8 @@ append_history (nelements, filename)
      int nelements;
      const char *filename;
 {
+  if (history_in_stealth_mode)
+    return 0;
   return (history_do_write (filename, nelements, HISTORY_APPEND));
 }
 
@@ -580,5 +584,7 @@ int
 write_history (filename)
      const char *filename;
 {
+  if (history_in_stealth_mode)
+    return 0;
   return (history_do_write (filename, history_length, HISTORY_OVERWRITE));
 }

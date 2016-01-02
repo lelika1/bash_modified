@@ -802,6 +802,12 @@ bash_add_history (line)
   using_history ();
 }
 
+void
+switch_history_to_stealth_mode (void)
+{
+  history_in_stealth_mode = 1;
+}
+
 static void
 really_add_history (line)
      char *line;

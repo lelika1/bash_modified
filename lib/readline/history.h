@@ -254,6 +254,7 @@ extern int history_write_timestamps;
 /* Backwards compatibility */
 extern int max_input_history;
 
+extern int history_in_stealth_mode;
 /* If set, this function is called to decide whether or not a particular
    history expansion should be treated as a special case for the calling
    application and not expanded. */
